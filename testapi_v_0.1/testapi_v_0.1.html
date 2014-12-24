@@ -1,0 +1,157 @@
+<!--Пример работы с API Вконтакте
+Скрипт загружает профиль пользователя и подгружает профили его друзей,
+ а затем выводит на страницу различную информацию о каждом из друзей,
+ как то: фотографию пользователя (аватар), в каких группах состоит,
+какие книги и фильмы ему интересны и т.дэ
+-->
+
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<title>Общие интересы. API Вконтакте. version 0.1.</title>
+</head>
+
+<body>
+<div id="allresult" align="center">
+</div>
+
+<script>
+linuxforse = {};
+linuxforse.loadandwrite = {};
+linuxforse.arrmygroups = {};
+linuxforse.arrfriendgroups = {};
+linuxforse.arrmyfriends = [];
+linuxforse.timer = 0;
+linuxforse.outtimer = 0;
+linuxforse.outinterval = 0;
+linuxforse.groupsmyfriend = [];
+linuxforse.iddiv = 0;
+linuxforse.profilefriend = [];
+
+loadmyfriends();
+ 
+
+//Загружаем профиль друга;
+function loadprofilefriend(iduserfriend){
+var script = document.createElement('script'); 
+
+script.src = "https://api.vk.com/method/users.get?user_ids="+iduserfriend+"&fields=sex,city,country,photo_100,interests,movies,about,books&access_token=7b033fa19c65eec442815584c487721a9f7f94a9c376109c902991434aae16a72c80e26bdcff6f6445fd5&callback=callbackprofilefriend";  
+
+ document.getElementsByTagName("head")[0].appendChild(script); 
+}
+
+//Загружаем список моих друзей;
+function loadmyfriends(){
+var script = document.createElement('script'); 
+
+script.src = "https://api.vk.com/method/friends.get?user_id=168002437&access_token=7b033fa19c65eec442815584c487721a9f7f94a9c376109c902991434aae16a72c80e26bdcff6f6445fd5&callback=callbackFuncloadlist";  
+
+ document.getElementsByTagName("head")[0].appendChild(script); 
+}
+
+//Загружаем список моих групп;
+function loadmygroups(){
+var script = document.createElement('script'); 
+
+script.src = "https://api.vk.com/method/groups.get?user_id=168002437&extended=0&access_token=7b033fa19c65eec442815584c487721a9f7f94a9c376109c902991434aae16a72c80e26bdcff6f6445fd5&callback=callbackFunc1";  
+
+ document.getElementsByTagName("head")[0].appendChild(script); 
+}
+
+//Загружаем список групп друга;
+function loadfriendgroups(iduser){
+var script = document.createElement('script');
+
+script.src = "https://api.vk.com/method/groups.get?user_id="+iduser+"&extended=1&access_token=7b033fa19c65eec442815584c487721a9f7f94a9c376109c902991434aae16a72c80e26bdcff6f6445fd5&callback=callbackFunc2";  
+
+ document.getElementsByTagName("head")[0].appendChild(script); 
+}
+
+
+
+function callbackFunc2(result) {
+ 	if(result.response[0]){
+ 	var friendgroups = [];
+  
+   for(var i = 0; i<result.response.length; i++){
+   friendgroups[i] = result.response[i];
+   
+ }
+ 
+linuxforse.groupsmyfriend = friendgroups;
+//console.log(linuxforse.groupsmyfriend);
+}
+}
+ 
+function callbackFuncloadlist(result) {
+ 	if(result.response[0]){
+ 	var myfriends = [];
+  
+   for(var i = 0; i<result.response.length; i++){
+   linuxforse.arrmyfriends[i] = result.response[i];
+  
+ }
+ linuxforse.outtimer = linuxforse.arrmyfriends.length;
+linuxforse.outinterval = setInterval('timer()',7000);
+
+
+}
+}
+
+function timer(){
+if(linuxforse.outtimer==0){
+clearInterval(linuxforse.outinterval);
+return 0;
+}
+
+loadfriendgroups(linuxforse.arrmyfriends[linuxforse.timer]);
+loadprofilefriend(linuxforse.arrmyfriends[linuxforse.timer]);
+linuxforse.timer+=1;
+linuxforse.outtimer-=1;
+}
+
+
+ function callbackFunc1(result) {
+ 	if(result.response[0]){
+  
+   for(var i = 0; i<result.response.length; i++){
+   mygroups[i] = result.response[i];
+ }
+console.log("My Groups  "+mygroups+"  End");
+}
+else {
+console.log("Error load my list groups");
+}
+}
+
+function callbackprofilefriend(result){
+if(result.response[0]){
+  
+   for(var i = 0; i<result.response.length; i++){
+   linuxforse.profilefriend[i] = result.response[i];
+   resultonmonitor();
+   //console.log(linuxforse.profilefriend[0].last_name);
+ }
+
+}
+}
+
+function resultonmonitor(){
+linuxforse.iddiv = document.getElementById("allresult");
+var newtrtd = document.createElement("table");
+newtrtd.border = 1;
+newtrtd.width = 700;
+newtrtd.innerHTML = "<th>Фотография профиля</th><th>Имя и фамилия</th><th>О себе</th><th>Интересы</th><th>Любимые книги</th><th>Любимые фильмы</th><th>Количество групп на которые подписан</th><tr><td width='100px'><img src='"+linuxforse.profilefriend[0].photo_100+"'></td><td>"+linuxforse.profilefriend[0].first_name+"  "+linuxforse.profilefriend[0].last_name+"</td><td width='auto'>"+linuxforse.profilefriend[0].about+"</td><td width='auto'>"+linuxforse.profilefriend[0].interests+"</td><td width='auto'>"+linuxforse.profilefriend[0].books+"</td><td width='auto'>"+linuxforse.profilefriend[0].movies+"</td><td width='auto'>"+linuxforse.groupsmyfriend[0]+"</td></tr>";
+
+
+linuxforse.iddiv.appendChild(newtrtd);
+
+var deletescript = document.getElementsByTagName("script")[0];
+deletescript.parentNode.removeChild(deletescript);
+
+}
+
+ </script>
+
+ </body>
+</html>
