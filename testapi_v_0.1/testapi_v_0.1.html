@@ -79,8 +79,9 @@ function callbackFunc2(result) {
  }
  
 linuxforse.groupsmyfriend = friendgroups;
-//console.log(linuxforse.groupsmyfriend);
+
 }
+
 }
  
 function callbackFuncloadlist(result) {
@@ -92,7 +93,7 @@ function callbackFuncloadlist(result) {
   
  }
  linuxforse.outtimer = linuxforse.arrmyfriends.length;
-linuxforse.outinterval = setInterval('timer()',7000);
+linuxforse.outinterval = setInterval('timer()',3000);
 
 
 }
@@ -111,6 +112,7 @@ linuxforse.outtimer-=1;
 }
 
 
+//Получаем список моих групп
  function callbackFunc1(result) {
  	if(result.response[0]){
   
@@ -124,24 +126,34 @@ console.log("Error load my list groups");
 }
 }
 
+//Загружаем профиль друга
 function callbackprofilefriend(result){
 if(result.response[0]){
   
    for(var i = 0; i<result.response.length; i++){
    linuxforse.profilefriend[i] = result.response[i];
    resultonmonitor();
-   //console.log(linuxforse.profilefriend[0].last_name);
  }
 
 }
 }
 
 function resultonmonitor(){
+	var a = 0;
+	var k = 0;
+	var z = 0;
+var m = [];
+for(var i = 1;i<linuxforse.groupsmyfriend.length; i++){
+	a = linuxforse.groupsmyfriend[i].name;
+	z = linuxforse.groupsmyfriend[i].screen_name;
+	k = i-1;
+	m[k] = "<a href = http://vk.com/"+z+">"+a+"</a>";
+}	
 linuxforse.iddiv = document.getElementById("allresult");
 var newtrtd = document.createElement("table");
 newtrtd.border = 1;
-newtrtd.width = 700;
-newtrtd.innerHTML = "<th>Фотография профиля</th><th>Имя и фамилия</th><th>О себе</th><th>Интересы</th><th>Любимые книги</th><th>Любимые фильмы</th><th>Количество групп на которые подписан</th><tr><td width='100px'><img src='"+linuxforse.profilefriend[0].photo_100+"'></td><td>"+linuxforse.profilefriend[0].first_name+"  "+linuxforse.profilefriend[0].last_name+"</td><td width='auto'>"+linuxforse.profilefriend[0].about+"</td><td width='auto'>"+linuxforse.profilefriend[0].interests+"</td><td width='auto'>"+linuxforse.profilefriend[0].books+"</td><td width='auto'>"+linuxforse.profilefriend[0].movies+"</td><td width='auto'>"+linuxforse.groupsmyfriend[0]+"</td></tr>";
+newtrtd.width = 900;
+newtrtd.innerHTML = "<th>Фотография профиля</th><th>Имя и фамилия</th><th>О себе</th><th>Интересы</th><th>Любимые книги</th><th>Любимые фильмы</th><th>Группы</th><tr><td width='100px'><img src='"+linuxforse.profilefriend[0].photo_100+"'></td><td>"+linuxforse.profilefriend[0].first_name+"  "+linuxforse.profilefriend[0].last_name+"</td><td width='auto'>"+linuxforse.profilefriend[0].about+"</td><td width='auto'>"+linuxforse.profilefriend[0].interests+"</td><td width='auto'>"+linuxforse.profilefriend[0].books+"</td><td width='auto'>"+linuxforse.profilefriend[0].movies+"</td><td width='auto'>"+m.join("<br>")+"</td></tr>";
 
 
 linuxforse.iddiv.appendChild(newtrtd);
